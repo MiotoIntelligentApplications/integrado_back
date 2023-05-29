@@ -2,37 +2,48 @@ import datetime as _dt
 import pydantic as _pydantic
 
 
-class _UserBase(_pydantic.BaseModel):
+class _VehicleOwnerBase(_pydantic.BaseModel):
+    document: str
     email: str
+    address: str
+    state: str
+    city: str
+    phone: str
 
 
-class UserCreate(_UserBase):
+class VehicleOwnerCreate(_VehicleOwnerBase):
     hashed_password: str
 
     class Config:
         orm_mode = True
 
 
-class User(_UserBase):
+class VehicleOwner(_VehicleOwnerBase):
     id: int
 
     class Config:
         orm_mode = True
 
 
-class _LeadBase(_pydantic.BaseModel):
-    first_name: str
-    last_name: str
-    email: str
-    company: str
-    note: str
+class _VehicleBase(_pydantic.BaseModel):
+    license_plate: str
+    license_plate_city: str
+    license_plate_state: str
+    v_type: str
+    v_make: str
+    v_model: str
+    color: str
+    year: int
+    renavam: str
+    chassis: str
+    axles_number: int
 
 
-class LeadCreate(_LeadBase):
+class VehicleCreate(_VehicleBase):
     pass
 
 
-class Lead(_LeadBase):
+class Vehicle(_VehicleBase):
     id: int
     owner_id: int
     date_created: _dt.datetime
