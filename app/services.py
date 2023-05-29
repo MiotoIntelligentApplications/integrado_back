@@ -35,7 +35,13 @@ async def get_vehicle_owner_by_email(db: _orm.Session, email: str):
 
 async def create_vehicle_owner(vehicle_owner: _schemas.VehicleOwnerCreate, db: _orm.Session):
     db_vehicle_owner = _models.VehicleOwner(
-        email=vehicle_owner.email, hashed_password=_hash.bcrypt.hash(vehicle_owner.hashed_password)
+        document=vehicle_owner.document,
+        email=vehicle_owner.email, 
+        address=vehicle_owner.address,
+        state=vehicle_owner.state,
+        city=vehicle_owner.city,
+        phone=vehicle_owner.phone,
+        hashed_password=_hash.bcrypt.hash(vehicle_owner.hashed_password), 
     )
     db.add(db_vehicle_owner)
     db.commit()
@@ -124,11 +130,17 @@ async def update_vehicle(
 ):
     vehicle_db = await _vehicle_selector(vehicle_id, vehicle_owner, db)
 
-    vehicle_db.first_name = vehicle.first_name
-    vehicle_db.last_name = vehicle.last_name
-    vehicle_db.email = vehicle.email
-    vehicle_db.company = vehicle.company
-    vehicle_db.note = vehicle.note
+    vehicle_db.license_plate = vehicle.license_plate
+    vehicle_db.license_plate_city = vehicle.license_plate_city
+    vehicle_db.license_plate_state = vehicle.license_plate_state
+    vehicle_db.v_model = vehicle.v_model
+    vehicle_db.v_type = vehicle.v_type
+    vehicle_db.v_make = vehicle.v_make
+    vehicle_db.year = vehicle.year
+    vehicle_db.color = vehicle.color
+    vehicle_db.renavam = vehicle.renavam
+    vehicle_db.chassis = vehicle.chassis
+    vehicle_db.axles_number = vehicle.axles_number
     vehicle_db.date_last_updated = _dt.datetime.utcnow()
 
     db.commit()

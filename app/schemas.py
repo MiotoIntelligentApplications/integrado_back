@@ -3,7 +3,12 @@ import pydantic as _pydantic
 
 
 class _VehicleOwnerBase(_pydantic.BaseModel):
+    document: str
     email: str
+    address: str
+    state: str
+    city: str
+    phone: str
 
 
 class VehicleOwnerCreate(_VehicleOwnerBase):
@@ -21,11 +26,17 @@ class VehicleOwner(_VehicleOwnerBase):
 
 
 class _VehicleBase(_pydantic.BaseModel):
-    first_name: str
-    last_name: str
-    email: str
-    company: str
-    note: str
+    license_plate: str
+    license_plate_city: str
+    license_plate_state: str
+    v_type: str
+    v_make: str
+    v_model: str
+    color: str
+    year: int
+    renavam: str
+    chassis: str
+    axles_number: int
 
 
 class VehicleCreate(_VehicleBase):

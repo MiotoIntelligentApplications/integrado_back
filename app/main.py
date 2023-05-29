@@ -33,7 +33,7 @@ async def generate_token(
     db: _orm.Session = _fastapi.Depends(_services.get_db),
 ):
     vehicle_owner = await _services.authenticate_vehicle_owner(
-        email=form_data.vehicle_ownername, password=form_data.password, db=db
+        email=form_data.username, password=form_data.password, db=db
     )
 
     if not vehicle_owner:
