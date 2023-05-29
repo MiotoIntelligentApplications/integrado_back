@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 
 import models as _models
 import database as _database
-from models import User, Lead
+from models import VehicleOwner, Vehicle
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 load_dotenv(os.path.join(BASE_DIR, ".env"))

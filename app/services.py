@@ -29,109 +29,109 @@ def get_db():
         db.close()
 
 
-async def get_user_by_email(db: _orm.Session, email: str):
-    return db.query(_models.User).filter(_models.User.email == email).first()
+async def get_vehicle_owner_by_email(db: _orm.Session, email: str):
+    return db.query(_models.VehicleOwner).filter(_models.VehicleOwner.email == email).first()
 
 
-async def create_user(user: _schemas.UserCreate, db: _orm.Session):
-    db_user = _models.User(
-        email=user.email, hashed_password=_hash.bcrypt.hash(user.hashed_password)
+async def create_vehicle_owner(vehicle_owner: _schemas.VehicleOwnerCreate, db: _orm.Session):
+    db_vehicle_owner = _models.VehicleOwner(
+        email=vehicle_owner.email, hashed_password=_hash.bcrypt.hash(vehicle_owner.hashed_password)
     )
-    db.add(db_user)
+    db.add(db_vehicle_owner)
     db.commit()
-    db.refresh(db_user)
-    return db_user
+    db.refresh(db_vehicle_owner)
+    return db_vehicle_owner
 
 
-async def authenticate_user(email: str, password: str, db: _orm.Session):
-    user = await get_user_by_email(db=db, email=email)
+async def authenticate_vehicle_owner(email: str, password: str, db: _orm.Session):
+    vehicle_owner = await get_vehicle_owner_by_email(db=db, email=email)
 
-    if not user:
+    if not vehicle_owner:
         return False
 
-    if not user.verify_password(password=password):
+    if not vehicle_owner.verify_password(password=password):
         return False
 
-    return user
+    return vehicle_owner
 
 
-async def create_token(user: _models.User):
-    user_obj = _schemas.User.from_orm(user)
+async def create_token(vehicle_owner: _models.VehicleOwner):
+    vehicle_owner_obj = _schemas.VehicleOwner.from_orm(vehicle_owner)
 
-    token = _jwt.encode(user_obj.dict(), JWT_SECRET)
+    token = _jwt.encode(vehicle_owner_obj.dict(), JWT_SECRET)
 
     return dict(access_token=token, token_type="bearer")
 
 
-async def get_current_user(
+async def get_current_vehicle_owner(
     db: _orm.Session = _fastapi.Depends(get_db),
     token: str = _fastapi.Depends(oauth2_schema),
 ):
     try:
         payload = _jwt.decode(token, JWT_SECRET, algorithms=["HS256"])
-        user = await get_user_by_email(db=db, email=payload.get("email"))
+        vehicle_owner = await get_vehicle_owner_by_email(db=db, email=payload.get("email"))
 
     except:
         raise _fastapi.HTTPException(status_code=401, detail="Invalid credentials")
 
-    return _schemas.User.from_orm(user)
+    return _schemas.VehicleOwner.from_orm(vehicle_owner)
 
 
-async def create_lead(user: _schemas.User, lead: _schemas.LeadCreate, db: _orm.Session):
-    db_lead = _models.Lead(**lead.dict(), owner_id=user.id)
-    db.add(db_lead)
+async def create_vehicle(vehicle_owner: _schemas.VehicleOwner, vehicle: _schemas.VehicleCreate, db: _orm.Session):
+    db_vehicle = _models.Vehicle(**vehicle.dict(), owner_id=vehicle_owner.id)
+    db.add(db_vehicle)
     db.commit()
-    db.refresh(db_lead)
+    db.refresh(db_vehicle)
 
-    return db_lead
-
-
-async def get_leads(user: _schemas.User, db: _orm.Session):
-    leads = db.query(_models.Lead).filter_by(owner_id=user.id)
-
-    return list(map(_schemas.Lead.from_orm, leads))
+    return db_vehicle
 
 
-async def _lead_selector(lead_id: int, user: _schemas.User, db: _orm.Session):
-    lead = (
-        db.query(_models.Lead)
-        .filter_by(owner_id=user.id)
-        .filter(_models.Lead.id == lead_id)
+async def get_vehicles(vehicle_owner: _schemas.VehicleOwner, db: _orm.Session):
+    vehicles = db.query(_models.Vehicle).filter_by(owner_id=vehicle_owner.id)
+
+    return list(map(_schemas.Vehicle.from_orm, vehicles))
+
+
+async def _vehicle_selector(vehicle_id: int, vehicle_owner: _schemas.VehicleOwner, db: _orm.Session):
+    vehicle = (
+        db.query(_models.Vehicle)
+        .filter_by(owner_id=vehicle_owner.id)
+        .filter(_models.Vehicle.id == vehicle_id)
         .first()
     )
 
-    if lead is None:
-        raise _fastapi.HTTPException(status_code=404, detail="Lead does not exist")
+    if vehicle is None:
+        raise _fastapi.HTTPException(status_code=404, detail="Vehicle does not exist")
 
-    return lead
-
-
-async def get_lead(lead_id: int, user: _schemas.User, db: _orm.Session):
-    lead = await _lead_selector(lead_id=lead_id, user=user, db=db)
-
-    return _schemas.Lead.from_orm(lead)
+    return vehicle
 
 
-async def delete_lead(lead_id: int, user: _schemas.User, db: _orm.Session):
-    lead = await _lead_selector(lead_id, user, db)
+async def get_vehicle(vehicle_id: int, vehicle_owner: _schemas.VehicleOwner, db: _orm.Session):
+    vehicle = await _vehicle_selector(vehicle_id=vehicle_id, vehicle_owner=vehicle_owner, db=db)
 
-    db.delete(lead)
+    return _schemas.Vehicle.from_orm(vehicle)
+
+
+async def delete_vehicle(vehicle_id: int, vehicle_owner: _schemas.VehicleOwner, db: _orm.Session):
+    vehicle = await _vehicle_selector(vehicle_id, vehicle_owner, db)
+
+    db.delete(vehicle)
     db.commit()
 
 
-async def update_lead(
-    lead_id: int, lead: _schemas.LeadCreate, user: _schemas.User, db: _orm.Session
+async def update_vehicle(
+    vehicle_id: int, vehicle: _schemas.VehicleCreate, vehicle_owner: _schemas.VehicleOwner, db: _orm.Session
 ):
-    lead_db = await _lead_selector(lead_id, user, db)
+    vehicle_db = await _vehicle_selector(vehicle_id, vehicle_owner, db)
 
-    lead_db.first_name = lead.first_name
-    lead_db.last_name = lead.last_name
-    lead_db.email = lead.email
-    lead_db.company = lead.company
-    lead_db.note = lead.note
-    lead_db.date_last_updated = _dt.datetime.utcnow()
+    vehicle_db.first_name = vehicle.first_name
+    vehicle_db.last_name = vehicle.last_name
+    vehicle_db.email = vehicle.email
+    vehicle_db.company = vehicle.company
+    vehicle_db.note = vehicle.note
+    vehicle_db.date_last_updated = _dt.datetime.utcnow()
 
     db.commit()
-    db.refresh(lead_db)
+    db.refresh(vehicle_db)
 
-    return _schemas.Lead.from_orm(lead_db)
+    return _schemas.Vehicle.from_orm(vehicle_db)

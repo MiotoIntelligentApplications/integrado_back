@@ -2,25 +2,25 @@ import datetime as _dt
 import pydantic as _pydantic
 
 
-class _UserBase(_pydantic.BaseModel):
+class _VehicleOwnerBase(_pydantic.BaseModel):
     email: str
 
 
-class UserCreate(_UserBase):
+class VehicleOwnerCreate(_VehicleOwnerBase):
     hashed_password: str
 
     class Config:
         orm_mode = True
 
 
-class User(_UserBase):
+class VehicleOwner(_VehicleOwnerBase):
     id: int
 
     class Config:
         orm_mode = True
 
 
-class _LeadBase(_pydantic.BaseModel):
+class _VehicleBase(_pydantic.BaseModel):
     first_name: str
     last_name: str
     email: str
@@ -28,11 +28,11 @@ class _LeadBase(_pydantic.BaseModel):
     note: str
 
 
-class LeadCreate(_LeadBase):
+class VehicleCreate(_VehicleBase):
     pass
 
 
-class Lead(_LeadBase):
+class Vehicle(_VehicleBase):
     id: int
     owner_id: int
     date_created: _dt.datetime
