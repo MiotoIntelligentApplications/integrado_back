@@ -80,7 +80,7 @@ async def delete_vehicle(
     db: _orm.Session = _fastapi.Depends(_services.get_db),
 ):
     await _services.delete_vehicle(vehicle_id, vehicle_owner, db)
-    return {"message", "Successfully Deleted"}
+    return {"message", "Deletado com sucesso"}
 
 
 @app.put("/api/vehicles/{vehicle_id}", status_code=200)
@@ -91,4 +91,4 @@ async def update_vehicle(
     db: _orm.Session = _fastapi.Depends(_services.get_db),
 ):
     await _services.update_vehicle(vehicle_id, vehicle, vehicle_owner, db)
-    return {"message", "Successfully Updated"}
+    return {"message", "Editado com sucesso"}

@@ -78,7 +78,7 @@ async def get_current_vehicle_owner(
         vehicle_owner = await get_vehicle_owner_by_email(db=db, email=payload.get("email"))
 
     except:
-        raise _fastapi.HTTPException(status_code=401, detail="Invalid credentials")
+        raise _fastapi.HTTPException(status_code=401, detail="Credenciais inválidas")
 
     return _schemas.VehicleOwner.from_orm(vehicle_owner)
 
@@ -107,7 +107,7 @@ async def _vehicle_selector(vehicle_id: int, vehicle_owner: _schemas.VehicleOwne
     )
 
     if vehicle is None:
-        raise _fastapi.HTTPException(status_code=404, detail="Vehicle does not exist")
+        raise _fastapi.HTTPException(status_code=404, detail="Veículo não encontrado")
 
     return vehicle
 
